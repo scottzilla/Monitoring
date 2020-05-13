@@ -1,0 +1,44 @@
+﻿@using Monitoring.Model;
+@model List<MonitorRecord>
+
+@{
+   ViewData["Title"] = "Mitek Monitoring";
+   List<string> Headers = new List<string> { "AppID","AppArea","Information","ModifiedDate" };
+
+}
+
+<div class="text-center">
+   <h1 class="display-4">Mitek Monitoring (Mock Data)</h1>
+
+   @if (Model.Count > 0)
+   {
+
+     <div class="wrapper">
+         
+         
+            @foreach(string header in Headers)
+            {
+               <div class="header">@header</div>
+            }
+            
+         
+
+         @foreach (MonitorRecord record in Model)
+         {
+
+             string cssClass = record.Error ? "entry-error" : "entry";
+             <div class=@cssClass>@record.AppID</div>
+             <div class=@cssClass>@record.AppArea</div>
+             <div class=@cssClass>@record.Information</div>
+             <div class=@cssClass>@record.ModifiedDate</div>
+         }
+      </div>
+
+   }
+
+   else
+   {
+
+      <div class="empty">There are no records to display</div>
+   }
+</div>

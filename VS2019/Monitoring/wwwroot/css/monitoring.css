@@ -1,0 +1,39 @@
+﻿body {
+    
+    background-color:#ccc;
+}
+
+
+.wrapper {
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr;
+   grid-gap: 10px;
+   background-color: #fff;
+   color: #444;
+}
+
+ .entry {
+   background-color: #444;
+   color: #fff;
+   border-radius: 5px;
+   padding: 20px;
+   font-size: 150%;
+}
+
+ .entry-error {
+      border-bottom: 7px solid red;
+      border-top: 7px solid red;
+      background-color: #444;
+      color: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      font-size: 150%;
+   }
+
+.header {
+   background-color: #808080;
+   color: #fff;
+   border-radius: 5px;
+   padding: 20px;
+   font-size: 150%;
+}
