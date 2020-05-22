@@ -26,20 +26,30 @@ namespace Monitoring.Controllers
         public IEnumerable<MonitorRecord> Get()
         {
             IEnumerable<MonitorRecord> monitorRecords = Monitoring.Persistance.SqlCommandUtility.GetAll(_configuration);
+            monitorRecords = monitorRecords.OrderByDescending(x => x.ModifiedDate).ToList();
             return monitorRecords;
         }
 
         // GET: api/Monitoring/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id:int}", Name = "Get")]
+
+        public IActionResult GetById(int id)
         {
-            return "value";
+            List<MonitorRecord> records = Monitoring.Persistance.SqlCommandUtility.GetEntriesByAppId(id, _configuration);
+            records = records.OrderByDescending(x => x.ModifiedDate).ToList();
+            return Ok(records);
+
         }
 
         // POST: api/Monitoring
         [HttpPost]
-        public void Post([FromBody] string value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult Post([FromBody] MonitorRecord monitorRecord)
         {
+
+            Monitoring.Persistance.SqlCommandUtility.AddMonitorRecordEntry(monitorRecord, _configuration);
+            return Ok();
         }
 
         // PUT: api/Monitoring/5
@@ -49,9 +59,11 @@ namespace Monitoring.Controllers
         }
 
         // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public void Delete(int id)
         {
+            Monitoring.Persistance.SqlCommandUtility.DeleteMonitorRecordsBasedOnAppId(id, _configuration);
         }
     }
+
 }

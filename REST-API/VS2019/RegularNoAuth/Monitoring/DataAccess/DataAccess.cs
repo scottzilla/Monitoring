@@ -5,18 +5,17 @@ using System.Threading.Tasks;
 using Monitoring.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Monitoring;
+
 /* https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient.sqlcommand?view=sqlclient-dotnet-core-1.1 */
 
-/* We may end up going with EF Core however for now let's get this working with SqlCommand objects (perhaps Dapper ):
-https://www.iamtimcorey.com/blog/137806/entity-framework */
 
 namespace Monitoring.Persistance
 {
     public static class SqlCommandUtility
     {
 
-        private static readonly string _tableName = "[dbo].Monitoring";
-        private static readonly string _noStringEntry = "N/A";
+       
 
         public static List<MonitorRecord> ExecuteDataReader(string query,IConfiguration config)
         {
@@ -46,24 +45,33 @@ namespace Monitoring.Persistance
 
         }
 
+        public static bool ApplicationIdExists(int id,IConfiguration config)
+        {
+            string query = $"select count(*) from {Constants.Persistance._applicationTableName} where appId={id}";
+
+            object obj = ExecuteScalar(query, config);
+
+            return Convert.ToInt32(obj) > 0;
+        }
+
         public static List<MonitorRecord> GetEntriesByAppId(int Id,IConfiguration config)
         {
             List<MonitorRecord> monitorRecords = new List<MonitorRecord>();
-            string query = $"select * from {_tableName} where appId={Id}";
+            string query = $"select * from {Constants.Persistance._monitoringTableName} where appId={Id}";
 
             return ExecuteDataReader(query,config);
         }
 
         public static List<MonitorRecord> GetAll(IConfiguration config)
         {
-            string commandText = $"select * from {_tableName}";
+            string commandText = $"select * from {Constants.Persistance._monitoringTableName}";
             return ExecuteDataReader(commandText,config);
 
         }
 
         public static void AddMonitorRecordEntry(MonitorRecord monitorRecord,IConfiguration config)
         {
-            string commandText = $"INSERT INTO [{_tableName}] VALUES (@AppId, @AppArea, @Information,@Comments,@Error,getdate())";
+            string commandText = $"INSERT INTO [{Constants.Persistance._monitoringTableName}] VALUES (@AppId, @AppArea, @Information,@Comments,@Error,getdate())";
 
             using(SqlCommand command = new SqlCommand(commandText, GetSqlConnection(config)))
             {
@@ -81,7 +89,7 @@ namespace Monitoring.Persistance
 
         public static int DeleteMonitorRecordsBasedOnAppId(int Id,IConfiguration config)
         {
-            string commandText = $"delete from {_tableName} where id={Id}";
+            string commandText = $"delete from {Constants.Persistance._monitoringTableName} where id={Id}";
             return ExecuteNonQuery(commandText,config);
         }
 
@@ -97,6 +105,18 @@ namespace Monitoring.Persistance
             }
         }
 
+        public static object ExecuteScalar(string commandText,IConfiguration config)
+        {
+            using(SqlConnection conn = GetSqlConnection(config))
+            {
+                using(SqlCommand com = new SqlCommand(commandText, conn))
+                {
+                    com.Connection.Open();
+                    return com.ExecuteScalar();
+                }
+            }
+        }
+
         public static SqlConnection GetSqlConnection(IConfiguration config)
         {
             string connectionString=config.GetConnectionString("DefaultConnection");            
@@ -106,7 +126,7 @@ namespace Monitoring.Persistance
         public static string PrepareInputString(string input)
         {
             
-            return string.IsNullOrWhiteSpace(input) ? _noStringEntry : input;
+            return string.IsNullOrWhiteSpace(input) ? Constants.Persistance._noStringEntry : input;
         }
 
     }
