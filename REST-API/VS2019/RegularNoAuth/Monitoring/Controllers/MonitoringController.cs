@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Monitoring.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Monitoring.Model;
-using Microsoft.Extensions.Configuration;
 
 namespace Monitoring.Controllers
 {
@@ -32,10 +30,12 @@ namespace Monitoring.Controllers
 
         // GET: api/Monitoring/5
         [ProducesResponseType(StatusCodes.Status200OK)]
+       
         [HttpGet("{id:int}", Name = "Get")]
 
-        public IActionResult GetById(int id)
+        public ActionResult GetById(int id)
         {
+            //add validation
             List<MonitorRecord> records = Monitoring.Persistance.SqlCommandUtility.GetEntriesByAppId(id, _configuration);
             records = records.OrderByDescending(x => x.ModifiedDate).ToList();
             return Ok(records);
@@ -45,24 +45,22 @@ namespace Monitoring.Controllers
         // POST: api/Monitoring
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Post([FromBody] MonitorRecord monitorRecord)
+        //[ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult Post([FromBody] MonitorRecord monitorRecord)
         {
-
+            //add validation
             Monitoring.Persistance.SqlCommandUtility.AddMonitorRecordEntry(monitorRecord, _configuration);
             return Ok();
         }
-
-        // PUT: api/Monitoring/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+                
 
         // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id:int}")]
-        public void Delete(int id)
+        [HttpDelete("{id:int}",Name ="delete")]
+        public ActionResult  Delete(int id)
         {
+            //add validation
             Monitoring.Persistance.SqlCommandUtility.DeleteMonitorRecordsBasedOnAppId(id, _configuration);
+            return Ok();
         }
     }
 

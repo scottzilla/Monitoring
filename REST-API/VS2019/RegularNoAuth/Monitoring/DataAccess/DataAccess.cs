@@ -15,8 +15,6 @@ namespace Monitoring.Persistance
     public static class SqlCommandUtility
     {
 
-       
-
         public static List<MonitorRecord> ExecuteDataReader(string query,IConfiguration config)
         {
             List<MonitorRecord> monitorRecords = new List<MonitorRecord>();
@@ -71,7 +69,7 @@ namespace Monitoring.Persistance
 
         public static void AddMonitorRecordEntry(MonitorRecord monitorRecord,IConfiguration config)
         {
-            string commandText = $"INSERT INTO [{Constants.Persistance._monitoringTableName}] VALUES (@AppId, @AppArea, @Information,@Comments,@Error,getdate())";
+            string commandText = $"INSERT INTO {Constants.Persistance._monitoringTableName} VALUES (@AppId, @AppArea, @Information,@Comments,@Error,getdate())";
 
             using(SqlCommand command = new SqlCommand(commandText, GetSqlConnection(config)))
             {
