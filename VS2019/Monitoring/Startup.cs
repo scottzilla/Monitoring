@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,7 +27,7 @@ namespace Monitoring
       }
 
       // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-      public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+      public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
       {
          if (env.IsDevelopment())
          {
@@ -52,6 +52,12 @@ namespace Monitoring
                    name: "default",
                    pattern: "{controller=Home}/{action=Index}/{id?}");
             endpoints.MapHealthChecks("/healthz");
+         });
+
+         // graceful shutdown for K8s, etc.
+         appLifetime.ApplicationStopping.Register(() =>
+         {
+            Thread.Sleep(20000);
          });
       }
    }
