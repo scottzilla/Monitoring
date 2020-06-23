@@ -51,6 +51,7 @@ namespace Monitoring
             endpoints.MapControllerRoute(
                    name: "default",
                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            endpoints.MapHealthChecks("/healthz");
          });
       }
    }

@@ -20,7 +20,14 @@ namespace Monitoring
           Host.CreateDefaultBuilder(args)
               .ConfigureWebHostDefaults(webBuilder =>
               {
-                 webBuilder.UseStartup<Startup>();
+                 webBuilder
+                  .UseStartup<Startup>()
+                  .UseKestrel(kso => {
+                     kso.Limits.MaxConcurrentConnections = null;
+                     kso.Limits.MaxConcurrentUpgradedConnections = null;
+                     kso.Limits.MaxRequestBodySize = 30000000; // 28.6MB is default
+                     kso.Limits.KeepAliveTimeout = new TimeSpan(0,2,0);
+                  });
               });
    }
 }
